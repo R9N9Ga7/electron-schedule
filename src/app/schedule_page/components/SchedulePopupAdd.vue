@@ -139,7 +139,7 @@
         </template>
       </div>
       <div
-        v-if="stream.ID"
+        v-if="isSubmit"
         class="d-flex align-items-center"
       >
         <button
@@ -203,6 +203,12 @@ export default {
     ...mapState({
       type: (state) => state.schedule.type,
     }),
+    isSubmit() {
+      if (this.type !== 'Аудитория') {
+        return this.audit.ID;
+      }
+      return this.disciplineType.ID;
+    },
   },
   watch: {
     async day() {
