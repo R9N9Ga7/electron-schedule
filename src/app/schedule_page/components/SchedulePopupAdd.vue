@@ -13,29 +13,7 @@
         >X</button>
       </div>
       <div>
-        <p>День</p>
-        <v-select
-          placeholder="День"
-          :options="days"
-          :getOptionLabel="item => item.NAME"
-          label="NAME"
-          v-model="day"
-          :clearable="false"
-          :loading="!days.length"
-        />
-        <template v-if="day.ID">
-          <p>Цвет</p>
-          <v-select
-            placeholder="Цвет"
-            :options="colors"
-            :getOptionLabel="item => item.NAME"
-            label="NAME"
-            v-model="color"
-            :clearable="false"
-            :loading="!colors.length"
-          />
-        </template>
-        <template v-if="(type === 'Преподаватель' || type === 'Аудитория') && color.ID">
+        <template v-if="groupCondition">
           <p>Группа</p>
           <v-select
             placeholder="Группа"
@@ -48,18 +26,8 @@
             :loading="!groups.length"
           />
         </template>
-        <template v-if="color.ID">
+        <template v-if="disciplineCondition">
           <p>Дисциплина</p>
-          <!-- <v-select
-            v-if="type === 'Преподаватель' || type === 'Аудитория'"
-            placeholder="Дисциплина"
-            :options="disciplinesAll"
-            :getOptionLabel="item => item.NAME"
-            label="NAME"
-            v-model="discipline"
-            :clearable="false"
-            :loading="!disciplinesAll.length"
-          /> -->
           <v-select
             placeholder="Дисциплина"
             :options="disciplines"
@@ -70,19 +38,7 @@
             :loading="!disciplines.length"
           />
         </template>
-        <template v-if="discipline.ID">
-          <p>Время</p>
-          <v-select
-            placeholder="Время"
-            :options="times"
-            :getOptionLabel="item => item.NAME"
-            label="NAME"
-            v-model="time"
-            :clearable="false"
-            :loading="!times.length"
-          />
-        </template>
-        <template v-if="time.ID && type !== 'Преподаватель'">
+        <template v-if="teacherCondition">
           <p>Преподаватель</p>
           <v-select
             placeholder="Преподаватель"
@@ -95,7 +51,7 @@
             :loading="!teachers.length"
           />
         </template>
-        <template v-if="time.ID">
+        <template v-if="disciplineTypesCondition">
           <p>Тип занятия</p>
           <v-select
             placeholder="Тип занятия"
@@ -107,7 +63,43 @@
             :loading="!disciplineTypes.length"
           />
         </template>
-        <template v-if="disciplineType.ID && type !== 'Аудитория'">
+        <template v-if="dayCondition">
+          <p>День</p>
+          <v-select
+            placeholder="День"
+            :options="days"
+            :getOptionLabel="item => item.NAME"
+            label="NAME"
+            v-model="day"
+            :clearable="false"
+            :loading="!days.length"
+          />
+        </template>
+        <template v-if="colorCondition">
+          <p>Цвет</p>
+          <v-select
+            placeholder="Цвет"
+            :options="colors"
+            :getOptionLabel="item => item.NAME"
+            label="NAME"
+            v-model="color"
+            :clearable="false"
+            :loading="!colors.length"
+          />
+        </template>
+        <template v-if="timeCondition">
+          <p>Время</p>
+          <v-select
+            placeholder="Время"
+            :options="times"
+            :getOptionLabel="item => item.NAME"
+            label="NAME"
+            v-model="time"
+            :clearable="false"
+            :loading="!times.length"
+          />
+        </template>
+        <template v-if="auditoryCondition">
           <p>Аудитория</p>
           <v-select
             placeholder="Аудитория"
@@ -125,7 +117,7 @@
             </template>
           </v-select>
         </template>
-        <template v-if="audit.ID || disciplineType.ID">
+        <template v-if="streamCondition">
           <p>Поток</p>
           <v-select
             placeholder="Поток"
@@ -203,108 +195,132 @@ export default {
     ...mapState({
       type: (state) => state.schedule.type,
     }),
+    groupCondition() {
+      return this.type !== 'Группа';
+    },
+    disciplineCondition() {
+      if (this.type === 'Группа') {
+        return true;
+      }
+      return this.group.ID;
+    },
+    teacherCondition() {
+      return this.discipline.ID && this.type !== 'Преподаватель';
+    },
+    disciplineTypesCondition() {
+      if (this.type === 'Преподаватель' && this.discipline.ID) {
+        return true;
+      }
+      return this.teacher.ID;
+    },
+    dayCondition() {
+      return this.disciplineType.ID;
+    },
+    colorCondition() {
+      return this.day.ID && this.dayCondition;
+    },
+    timeCondition() {
+      return this.color.ID;
+    },
+    auditoryCondition() {
+      return this.type !== 'Аудитория' && this.time.ID;
+    },
+    streamCondition() {
+      if (this.type === 'Аудитория' && this.time.ID) {
+        return true;
+      }
+      return this.audit.ID;
+    },
     isSubmit() {
       if (this.type !== 'Аудитория') {
         return this.audit.ID;
       }
-      return this.disciplineType.ID;
+      return this.time.ID;
     },
   },
   watch: {
-    async day() {
-      this.color = '';
-      this.discipline = '';
-      this.time = '';
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
 
-      if (this.day.ID) {
+    async group(value) {
+      if (value) {
+        if (this.type === 'Группа') {
+          const disciplines = await getDisciplines(this.$route.query.group_id);
+          this.disciplines = disciplines.message;
+        }
+        if (this.type === 'Преподаватель' || this.type === 'Аудитория') {
+          const disciplines = await getDisciplines(this.group.ID);
+          this.disciplines = disciplines.message;
+        }
+      }
+    },
+
+    async disciplineCondition(value) {
+      console.log(value);
+      if (value) {
+        if (this.type === 'Группа') {
+          const disciplines = await getDisciplines(this.$route.query.group_id);
+          this.disciplines = disciplines.message;
+        }
+        if (this.type === 'Преподаватель' || this.type === 'Аудитория') {
+          const disciplines = await getDisciplines(this.group.ID);
+          this.disciplines = disciplines.message;
+        }
+      }
+    },
+
+    async teacherCondition(value) {
+      if (value) {
+        const teachers = await getTeachers(this.payload());
+        this.teachers = teachers.message;
+      }
+    },
+
+    async disciplineTypesCondition(value) {
+      if (value) {
+        const disciplineTypes = await getDisciplineTypes(this.payload());
+        this.disciplineTypes = disciplineTypes.message;
+      }
+    },
+
+    async dayCondition(value) {
+      if (value) {
+        const days = await getDays(this.$route.query.group_id);
+        this.days = days.message;
+      }
+    },
+
+    async colorCondition(value) {
+      if (value) {
         const colors = await getColors(this.$route.query.group_id);
         this.colors = colors.message;
       }
     },
-    async color() {
-      this.discipline = '';
-      this.time = '';
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
 
-      if (this.color.ID) {
-        if (this.type === 'Группа') {
-          const disciplines = await getDisciplines(this.$route.query.group_id);
-          this.disciplines = disciplines.message;
-        }
-        if (this.type === 'Преподаватель' || this.type === 'Аудитория') {
-          console.log('=====> ', this.group.ID);
-          const disciplines = await getDisciplines(this.group.ID);
-          this.disciplines = disciplines.message;
-        }
-      }
-    },
-    async group() {
-      this.discipline = '';
-      this.time = '';
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.group.ID) {
-        if (this.type === 'Группа') {
-          const disciplines = await getDisciplines(this.$route.query.group_id);
-          this.disciplines = disciplines.message;
-        }
-        if (this.type === 'Преподаватель' || this.type === 'Аудитория') {
-          console.log('=====> ', this.group.ID);
-          const disciplines = await getDisciplines(this.group.ID);
-          this.disciplines = disciplines.message;
-        }
-        const streams = await getStreams(this.payload());
-        this.streams = streams.message;
-      }
-    },
-    async discipline() {
-      this.time = '';
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.discipline.ID) {
+    async color(value) {
+      if (value) {
         const times = await getTimes(this.payload());
         this.times = times.message;
       }
     },
-    async time() {
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
 
-      if (this.time.ID) {
-        const teachers = await getTeachers(this.payload());
-        this.teachers = teachers.message;
-        const disciplineTypes = await getDisciplineTypes(this.payload());
-        this.disciplineTypes = disciplineTypes.message;
+    async timeCondition(value) {
+      if (value) {
+        const times = await getTimes(this.payload());
+        this.times = times.message;
       }
     },
-    async teacher() {
-      this.disciplineType = '';
-      this.audit = '';
 
-      if (this.teacher.ID) {
-        const disciplineTypes = await getDisciplineTypes(this.payload());
-        this.disciplineTypes = disciplineTypes.message;
-      }
-    },
-    async disciplineType() {
-      this.audit = '';
-
-      if (this.discipline.ID) {
+    async auditoryCondition(value) {
+      if (value) {
         const audits = await getAudits(this.payload());
         this.audits = audits.message;
       }
     },
-    // *******************
-    audit(value) {
+
+    async streamCondition(value) {
+      if (value) {
+        const streams = await getStreams(this.payload());
+        this.streams = streams.message;
+      }
     },
   },
   methods: {
@@ -328,6 +344,14 @@ export default {
         }
       }
 
+      if (this.type === 'Преподаватель') {
+        payload.teacher_id = this.$route.query.group_id;
+      }
+
+      if (this.audit.ID) {
+        payload.hall = this.audit.ID;
+      }
+
       if (this.time.ID) {
         payload.time_id = this.time.ID;
       }
@@ -337,7 +361,7 @@ export default {
       }
 
       if (this.disciplineType.ID) {
-        payload.discipline_type_id = this.discipline.ID;
+        payload.discipline_type_id = this.disciplineType.ID;
       }
 
       return payload;
@@ -403,18 +427,17 @@ export default {
       NAME: this.$route.query.week_day_value,
     }
 
-    const days = await getDays(this.$route.query.group_id);
-    this.days = days.message;
-
     const groups = await getGroups();
     this.groups = groups.message;
 
-    const streams = await getStreams(this.payload());
-    this.streams = streams.message;
-
-
-    // const disciplinesAll = await getDisciplinesAll();
-    // this.disciplinesAll = disciplinesAll.message;
+    if (this.type === 'Группа') {
+      const disciplines = await getDisciplines(this.$route.query.group_id);
+      this.disciplines = disciplines.message;
+    }
+    if (this.type === 'Преподаватель' || this.type === 'Аудитория') {
+      const disciplines = await getDisciplines(this.group.ID);
+      this.disciplines = disciplines.message;
+    }
   },
 };
 </script>

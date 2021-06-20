@@ -13,29 +13,7 @@
         >X</button>
       </div>
       <div>
-        <p>День</p>
-        <v-select
-          placeholder="День"
-          :options="days"
-          :getOptionLabel="item => item.NAME"
-          label="NAME"
-          v-model="day"
-          :clearable="false"
-          :loading="!days.length"
-        />
-        <template v-if="day.ID">
-          <p>Цвет</p>
-          <v-select
-            placeholder="Цвет"
-            :options="colors"
-            :getOptionLabel="item => item.NAME"
-            label="NAME"
-            v-model="color"
-            :clearable="false"
-            :loading="!colors.length"
-          />
-        </template>
-        <template v-if="color.ID">
+        <template>
           <p>Дисциплина</p>
           <v-select
             placeholder="Дисциплина"
@@ -47,19 +25,7 @@
             :loading="!disciplines.length"
           />
         </template>
-        <template v-if="discipline.ID">
-          <p>Время</p>
-          <v-select
-            placeholder="Время"
-            :options="times"
-            :getOptionLabel="item => item.NAME"
-            label="NAME"
-            v-model="time"
-            :clearable="false"
-            :loading="!times.length"
-          />
-        </template>
-        <template v-if="time.ID">
+        <template v-if="teacherCondition">
           <p>Преподаватель</p>
           <v-select
             placeholder="Преподаватель"
@@ -72,7 +38,7 @@
             :loading="!teachers.length"
           />
         </template>
-        <template v-if="teacher.ID">
+        <template v-if="disciplineTypesCondition">
           <p>Тип занятия</p>
           <v-select
             placeholder="Тип занятия"
@@ -84,7 +50,43 @@
             :loading="!disciplineTypes.length"
           />
         </template>
-        <template v-if="disciplineType.ID">
+        <template v-if="dayCondition">
+          <p>День</p>
+          <v-select
+            placeholder="День"
+            :options="days"
+            :getOptionLabel="item => item.NAME"
+            label="NAME"
+            v-model="day"
+            :clearable="false"
+            :loading="!days.length"
+          />
+        </template>
+        <template v-if="colorCondition">
+          <p>Цвет</p>
+          <v-select
+            placeholder="Цвет"
+            :options="colors"
+            :getOptionLabel="item => item.NAME"
+            label="NAME"
+            v-model="color"
+            :clearable="false"
+            :loading="!colors.length"
+          />
+        </template>
+        <template v-if="timeCondition">
+          <p>Время</p>
+          <v-select
+            placeholder="Время"
+            :options="times"
+            :getOptionLabel="item => item.NAME"
+            label="NAME"
+            v-model="time"
+            :clearable="false"
+            :loading="!times.length"
+          />
+        </template>
+        <template v-if="auditoryCondition">
           <p>Аудитория</p>
           <v-select
             placeholder="Аудитория"
@@ -102,7 +104,7 @@
             </template>
           </v-select>
         </template>
-        <template v-if="audit.ID">
+        <template v-if="streamCondition">
           <p>Поток</p>
           <v-select
             placeholder="Поток"
@@ -116,7 +118,7 @@
         </template>
       </div>
       <div
-        v-if="audit.ID"
+        v-if="streamCondition"
         class="d-flex align-items-center"
       >
         <button
@@ -170,73 +172,144 @@ export default {
       loading: false,
     };
   },
+  computed: {
+    teacherCondition() {
+      return this.discipline.ID;
+    },
+    disciplineTypesCondition() {
+      return this.teacher.ID;
+    },
+    dayCondition() {
+      return this.disciplineType.ID;
+    },
+    colorCondition() {
+      return this.day.ID && this.dayCondition;
+    },
+    timeCondition() {
+      return this.color.ID;
+    },
+    auditoryCondition() {
+      return this.time.ID;
+    },
+    streamCondition() {
+      return this.audit.ID;
+    },
+  },
   watch: {
-    async day() {
-      this.color = '';
-      this.discipline = '';
-      this.time = '';
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.day.ID) {
-        const colors = await getColors(this.payload());
-        this.colors = colors.message;
-      }
-    },
-    async color() {
-      this.discipline = '';
-      this.time = '';
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.color.ID) {
-        const disciplines = await getDisciplines(this.payload());
-        this.disciplines = disciplines.message;
-      }
-    },
-    async discipline() {
-      this.time = '';
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.discipline.ID) {
-        const times = await getTimes(this.payload());
-        this.times = times.message;
-      }
-    },
-    async time() {
-      this.teacher = '';
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.time.ID) {
+    async discipline(value) {
+      if (value) {
         const teachers = await getTeachers(this.payload());
         this.teachers = teachers.message;
       }
     },
-    async teacher() {
-      this.disciplineType = '';
-      this.audit = '';
-
-      if (this.teacher.ID) {
+    async teacherCondition(value) {
+      if (value) {
+        const teachers = await getTeachers(this.payload());
+        this.teachers = teachers.message;
+      }
+    },
+    async disciplineTypesCondition(value) {
+      if (value) {
         const disciplineTypes = await getDisciplineTypes(this.payload());
         this.disciplineTypes = disciplineTypes.message;
       }
     },
-    async disciplineType() {
-      this.audit = '';
-
-      if (this.discipline.ID) {
+    async dayCondition(value) {
+      if (value) {
+        const days = await getDays(this.payload());
+        this.days = days.message;
+      }
+    },
+    async colorCondition(value) {
+      if (value) {
+        const colors = await getColors(this.payload());
+        this.colors = colors.message;
+      }
+    },
+    async timeCondition(value) {
+      if (value) {
+        const times = await getTimes(this.payload());
+        this.times = times.message;
+      }
+    },
+    async auditoryCondition(value) {
+      if (value) {
         const audits = await getAudits(this.payload());
         this.audits = audits.message;
       }
     },
-    // *******************
-    audit(value) {
+    async streamCondition(value) {
+      if (value) {
+        const streams = await getStreams(this.payload());
+        this.streams = streams.message;
+      }
     },
+    // async day() {
+    //   this.color = '';
+    //   this.discipline = '';
+    //   this.time = '';
+    //   this.teacher = '';
+    //   this.disciplineType = '';
+    //   this.audit = '';
+
+    //   if (this.day.ID) {
+    //     const colors = await getColors(this.payload());
+    //     this.colors = colors.message;
+    //   }
+    // },
+    // async color() {
+    //   this.discipline = '';
+    //   this.time = '';
+    //   this.teacher = '';
+    //   this.disciplineType = '';
+    //   this.audit = '';
+
+    //   if (this.color.ID) {
+    //     const disciplines = await getDisciplines(this.payload());
+    //     this.disciplines = disciplines.message;
+    //   }
+    // },
+    // async discipline() {
+    //   this.time = '';
+    //   this.teacher = '';
+    //   this.disciplineType = '';
+    //   this.audit = '';
+
+    //   if (this.discipline.ID) {
+    //     const times = await getTimes(this.payload());
+    //     this.times = times.message;
+    //   }
+    // },
+    // async time() {
+    //   this.teacher = '';
+    //   this.disciplineType = '';
+    //   this.audit = '';
+
+    //   if (this.time.ID) {
+    //     const teachers = await getTeachers(this.payload());
+    //     this.teachers = teachers.message;
+    //   }
+    // },
+    // async teacher() {
+    //   this.disciplineType = '';
+    //   this.audit = '';
+
+    //   if (this.teacher.ID) {
+    //     const disciplineTypes = await getDisciplineTypes(this.payload());
+    //     this.disciplineTypes = disciplineTypes.message;
+    //   }
+    // },
+    // async disciplineType() {
+    //   this.audit = '';
+
+    //   if (this.discipline.ID) {
+    //     const audits = await getAudits(this.payload());
+    //     this.audits = audits.message;
+    //   }
+    // },
+    // *******************
+    // audit(value) {
+    // },
   },
   methods: {
     ...mapActions({
@@ -264,6 +337,11 @@ export default {
       if (this.disciplineType.ID) {
         payload.discipline_type_id = this.discipline.ID;
       }
+
+      console.log(
+        '===================>',
+        payload
+      );
 
       return payload;
     },
@@ -297,11 +375,14 @@ export default {
       NAME: this.dayData.weekDay.value,
     }
 
-    const days = await getDays(this.payload());
-    this.days = days.message;
+    const disciplines = await getDisciplines(this.payload());
+    this.disciplines = disciplines.message;
 
-    const streams = await getStreams(this.payload());
-    this.streams = streams.message;
+    // const days = await getDays(this.payload());
+    // this.days = days.message;
+
+    // const streams = await getStreams(this.payload());
+    // this.streams = streams.message;
   },
 };
 </script>
