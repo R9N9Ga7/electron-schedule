@@ -1,4 +1,4 @@
-export const API_URL = 'http://185.68.21.151:8080';
+export const API_URL = localStorage.getItem('host') || 'http://185.68.21.151:8080';
 
 export const times = [
   '8:00-9:30',
