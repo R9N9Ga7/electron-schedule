@@ -203,10 +203,11 @@ export default {
 
       if (!this.weekColor) {
 
-        this.chartLabels = this.weekColorOptions.map((el) => {
+        this.weekColorOptions.forEach((el) => {
           this.chartDataColor.push(colors[el.NAME]);
-          return el.NAME
         });
+
+        this.chartLabels = ['Всегда', 'Белая', 'Зеленая'];
 
         const disciplineCountArr = [0, 0, 0];
         this.auditoryInfo.hours.forEach((el) => {

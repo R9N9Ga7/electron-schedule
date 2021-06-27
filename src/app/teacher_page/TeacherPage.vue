@@ -147,18 +147,19 @@ export default {
         'Всегда': 'rgba(255, 255, 78, .4)',
         'Белая': 'rgb(245, 245, 245)',
         'Зеленая': 'rgba(19, 255, 78, .4)',
-        'Белая нечетная': 'rgba(244, 255, 199, 1)',
-        'Зеленая нечетная': 'rgba(26, 227, 155, 1)',
-        'Белая четная': 'rgba(175, 186, 154, 1)',
-        'Зеленая четная': 'rgba(69, 186, 154, 1)',
+        // 'Белая нечетная': 'rgba(244, 255, 199, 1)',
+        // 'Зеленая нечетная': 'rgba(26, 227, 155, 1)',
+        // 'Белая четная': 'rgba(175, 186, 154, 1)',
+        // 'Зеленая четная': 'rgba(69, 186, 154, 1)',
       };
 
       if (!this.weekColor) {
 
-        this.chartLabels = this.weekColorOptions.map((el) => {
+        this.weekColorOptions.forEach((el) => {
           this.chartDataColor.push(colors[el.NAME]);
-          return el.NAME
         });
+
+        this.chartLabels = ['Всегда', 'Белая', 'Зеленая'];
 
         const disciplineCountArr = [0, 0, 0];
         this.teacherInfo.hours.forEach((el) => {
