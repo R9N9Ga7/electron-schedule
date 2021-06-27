@@ -56,7 +56,7 @@
           type="checkbox"
           id="flexSwitchCheckDefault4"
         >
-        <label class="form-check-label" for="flexSwitchCheckDefault4">У групп должно быть расписание</label>
+        <label class="form-check-label" for="flexSwitchCheckDefault4">Расписание должно соответствовать учебному плану</label>
       </div>
     </div>
   </div>
