@@ -20,7 +20,7 @@
       <h3>{{ departmentInfo.NAME }}</h3>
       <div class="m-1">
         <p class="m-0">
-          <strong>Часы</strong>
+          <strong>Количество пар</strong>
           <span class="ms-3">{{ departmentInfo.hours }}</span>
         </p>
       </div>

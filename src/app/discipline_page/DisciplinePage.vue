@@ -23,7 +23,7 @@
       <hr>
       <h3>{{ disciplineInfo.NAME }}</h3>
       <div class="m-1">
-        <p class="m-0"><strong>Часы</strong> {{ hours }}</p>
+        <p class="m-0"><strong>Количество пар</strong> {{ hours }}</p>
       </div>
       <div class="d-inline-block m-1">
         <p class="m-0">Группы</p>
