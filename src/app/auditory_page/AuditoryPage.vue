@@ -43,7 +43,7 @@
           </div>
         </div>
         <div style="width: 30%;">
-          <h5 class="mb-1">Количество часов</h5>
+          <h5 class="mb-1">Количество пар</h5>
           <v-select
             placeholder="Неделя"
             :options="weekColorOptions"

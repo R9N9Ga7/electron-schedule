@@ -117,7 +117,7 @@
             </template>
           </v-select>
         </template>
-        <template v-if="streamCondition">
+        <!-- <template v-if="streamCondition">
           <p>Поток</p>
           <v-select
             placeholder="Поток"
@@ -128,7 +128,7 @@
             :clearable="false"
             :loading="!streams.length"
           />
-        </template>
+        </template> -->
       </div>
       <div
         v-if="isSubmit"

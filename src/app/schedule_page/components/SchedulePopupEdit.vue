@@ -74,7 +74,7 @@
           :clearable="false"
           :loading="!disciplineTypes.length"
         />
-        <p>Поток</p>
+        <!-- <p>Поток</p>
         <v-select
           placeholder="Поток"
           :options="streams"
@@ -83,7 +83,7 @@
           v-model="stream"
           :clearable="false"
           :loading="!streams.length"
-        />
+        /> -->
       </div>
       <!-- <button @click="onSubmit" class="btn btn-primary">Сохранить</button> -->
     </div>
