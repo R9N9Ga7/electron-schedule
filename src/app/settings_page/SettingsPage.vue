@@ -25,7 +25,37 @@
         >
         <label class="form-check-label" for="flexSwitchCheckDefault1">У групп нет окон</label>
       </div>
-      <div class="form-check form-switch">
+      <div class="form-check form-switch d-flex align-items-center">
+        <input
+          @input="toggleSettingsMaxFive"
+          :value="max_five"
+          :checked="max_five == 1"
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheckDefault2"
+        >
+        <label class="form-check-label d-flex align-items-center ms-2" for="flexSwitchCheckDefault2">
+          <span>У групп максимум </span>
+          <input class="form-control mx-2" style="width: 40px;" type="text">
+          <span> пар в день</span>
+        </label>
+      </div>
+      <div class="form-check form-switch d-flex align-items-center">
+        <input
+          @input="toggleSettingsMaxFive"
+          :value="max_five"
+          :checked="max_five == 1"
+          class="form-check-input"
+          type="checkbox"
+          id="flexSwitchCheckDefault2"
+        >
+        <label class="form-check-label d-flex align-items-center ms-2" for="flexSwitchCheckDefault2">
+          <span>У групп минимум </span>
+          <input class="form-control mx-2" style="width: 40px;" type="text">
+          <span> пар в день</span>
+        </label>
+      </div>
+      <!-- <div class="form-check form-switch d-flex align-items-center">
         <input
           @input="toggleSettingsMaxFive"
           :value="max_five"
@@ -46,7 +76,7 @@
           id="flexSwitchCheckDefault3"
         >
         <label class="form-check-label" for="flexSwitchCheckDefault3">У групп минимум 2 пары в день</label>
-      </div>
+      </div> -->
       <div class="form-check form-switch">
         <input
           @input="toggleSettingsScheduleRequire"
