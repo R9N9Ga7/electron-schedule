@@ -17,10 +17,10 @@
         v-if="showNav"
         class="btn-group-vertical pt-2 w-100"
       >
-        <button
+        <!-- <button
           @click="onClickGoOut"
           class="btn btn-outline-danger"
-        >Выйти</button>
+        >Выйти</button> -->
         <router-link
           v-for="link in navLinks"
           :key="link.title"

@@ -63,17 +63,17 @@ const router = new VueRouter({
   routes,
 });
 
-function auth(to, from, next) {
-  if (to.path !== '/auth' && !localStorage.getItem('scheduleToken')) {
-    next('/auth');
-  } else if (to.path === '/auth' && localStorage.getItem('scheduleToken')) {
-    next('/');
-  } else {
-    next();
-  }
-}
+// function auth(to, from, next) {
+//   if (to.path !== '/auth' && !localStorage.getItem('scheduleToken')) {
+//     next('/auth');
+//   } else if (to.path === '/auth' && localStorage.getItem('scheduleToken')) {
+//     next('/');
+//   } else {
+//     next();
+//   }
+// }
 
-router.beforeEach(auth);
+// router.beforeEach(auth);
 
 
 export default router;
